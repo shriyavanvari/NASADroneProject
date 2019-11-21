@@ -14,7 +14,9 @@ const transactionSchema = new Schema({
     TransactionType:{type:String, required:true},
     Amount:{type:String,required:true},
     SenderAccountBalance:{type:Number,required:true},
-    ReceiverAccountBalance:{type:Number}
+    ReceiverAccountBalance:{type:Number},
+    Description:{type:String,required:true},
+    Comment:{type:String}
 
 });
 const Transaction = mongoose.model('Transaction', transactionSchema);
