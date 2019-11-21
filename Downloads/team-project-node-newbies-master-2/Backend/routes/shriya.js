@@ -53,6 +53,8 @@ router.post('/user/transferInternal',
                                         let Amount = "-"+req.body.amount;
                                         const SenderAccountBalance = sender1.AccountBalance;
                                         const ReceiverAccountBalance = receiver.AccountBalance;
+                                        const Description=ReceiverFirstName+" "+ReceiverLastName+" / "+ReceiverAccountNumber;
+                                        const Comment=req.body.comment;
                                         const newTransaction = new transaction({
                                             ReceiverFirstName,
                                             ReceiverLastName,
@@ -63,7 +65,9 @@ router.post('/user/transferInternal',
                                             TransactionType,
                                             Amount,
                                             SenderAccountBalance,
-                                            ReceiverAccountBalance
+                                            ReceiverAccountBalance,
+                                            Description,
+                                            Comment
                                         })
                                         newTransaction.save((err, result) => {
                                             if (err) {
@@ -71,6 +75,7 @@ router.post('/user/transferInternal',
                                             } else {
                                                 TransactionType = "Credit";
                                                 Amount = "+"+req.body.amount;
+                                                Description=SenderFirstName+" "+SenderLastName+" / "+SenderAccountNumber;
                                                 const newTransaction1 = new transaction({
                                                     ReceiverFirstName,
                                                     ReceiverLastName,
@@ -81,7 +86,10 @@ router.post('/user/transferInternal',
                                                     TransactionType,
                                                     Amount,
                                                     SenderAccountBalance,
-                                                    ReceiverAccountBalance
+                                                    ReceiverAccountBalance,
+                                                    Description,
+                                                    Comment
+                                                    
                                                 })
 
                                                 newTransaction1.save((err, result) => {
