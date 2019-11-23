@@ -4,6 +4,7 @@ var router = express.Router();
 var message = [];
 let randomize = require('randomatic');
 let user = require("../model/UserModel");
+let recurringPayment = require("../model/RecurringPaymentModel");
 
 router.get('/(:data)', function (req, res, next) {
     user.find({ CustomerID: req.params.data }, { _id: 0, __v: 0, CustomerID: 0 }).exec((err, result) => {
@@ -67,6 +68,43 @@ router.post('/user/createAccount',
         }
 
     })
+
+router.post('/user/closeAccount',
+    [check("accountNumber", "Account number is required").not().isEmpty()],
+    function (req, res, next) {
+        let message = [];
+        message = validationResult(req).errors;
+        if (message.length > 0) {
+            next(message);
+        }
+        else {
+            let updateData={isOpen:false,AccountBalance:0}
+            user.findOneAndUpdate({ AccountNumber: req.body.accountNumber}, updateData, { new: true }).exec((err, result) => {
+                if (err) {
+                    next();
+                }
+                else if (result == null) {
+                    let customError = [];
+                    let errors = { msg: "Account is unavailable or already closed!" };
+                    customError.push(errors);
+                    next(customError);
+                } else {
+                    
+                    recurringPayment.deleteMany({$or:[{SenderAccountNumber:req.body.accountNumber},{ReceiverAccountNumber:req.body.accountNumber}]}).exec((err,delResult)=>{
+                        if(err)
+                        {
+                            next()
+                        }else{
+                            res.status(200).send("Account closed successfully!");
+
+                        }
+                        
+                    })
+                }
+            })
+        }
+    }
+)
 
 router.use((error, req, res, next) => {
     res.writeHead(400, {
